@@ -26,38 +26,61 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true) // true while checking auth
 
   // On app start: check if user has a valid token
-  useEffect(() => {
-    async function checkAuth() {
-      if (hasToken()) {
-        try {
-          const currentUser = await getCurrentUser()
-          setUser(currentUser)
-        } catch (e) {
-          // Token invalid or expired
-          setUser(null)
-        }
-      }
-      setLoading(false)
-    }
-    checkAuth()
-  }, [])
+ useEffect(() => {
+  async function checkAuth() {
+    if (hasToken()) {
+      try {
+        const currentUser =
+          await getCurrentUser();
 
-  // ── Sign In (async) ──────────────────────────────────────────
-  async function signIn(email, password) {
-    try {
-      const loggedInUser = await apiLogin(email, password)
-      setUser(loggedInUser)
-      return { error: null }
-    } catch (e) {
-      return { error: e.message || 'Login failed. Please try again.' }
+        console.log(currentUser);
+
+        setUser(currentUser);
+      } catch (e) {
+        console.log(e);
+        setUser(null);
+      }
     }
+
+    setLoading(false);
   }
 
+  checkAuth();
+}, []);
+
+  // ── Sign In (async) ──────────────────────────────────────────
+ async function signIn(email, password) {
+  try {
+    const data = await apiLogin(email, password)
+
+    localStorage.setItem(
+      "token",
+      data.token
+    )
+
+    localStorage.setItem(
+      "role",
+      data.user.role
+    )
+
+    setUser(data.user)
+
+    return { error: null }
+
+  } catch (e) {
+    return {
+      error:
+        e.message ||
+        "Login failed. Please try again."
+    }
+  }
+}
+
   // ── Register (async) ─────────────────────────────────────────
-  async function register(name, email, password, role, phone) {
+  async function register(fullname, email, password, role, phone) {
     try {
       const newUser = await apiRegister({
-        name,
+        fullname,
         email,
         password,
         role,

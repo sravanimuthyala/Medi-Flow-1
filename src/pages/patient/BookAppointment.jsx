@@ -115,7 +115,7 @@ export default function BookAppointment() {
       setBooking(false)
     }
   }
-
+console.log(doctor.id);
   // ── Success screen ───────────────────────────────────────
   if (success) {
     return (

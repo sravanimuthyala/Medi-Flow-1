@@ -33,7 +33,9 @@ export default function Register() {
     const result = await register(name, email, password, role, phone)
 
     if (result.error) {
+      console.log(result)
       setError(result.error)
+
       setLoading(false)
       return
     }

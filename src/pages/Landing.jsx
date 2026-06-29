@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Heart, Calendar, Shield, AlertTriangle, Users, Stethoscope, FileText, ChevronRight, Activity, Star } from 'lucide-react'
+import { useAuth } from '../context/AuthContext';
+import { Navigate } from 'react-router-dom';
 
 // ─── Static data for the landing page ────────────────────────
 const stats = [
@@ -49,6 +51,23 @@ const portals = [
 ]
 
 export default function Landing() {
+  const { user, loading } = useAuth();
+   console.log("Landing User:", user);
+    if (loading) {
+    return null;
+  }
+
+  if (user) {
+    if (user.role === "admin") {
+      return <Navigate to="/admin" replace />;
+    }
+
+    if (user.role === "doctor") {
+      return <Navigate to="/doctor" replace />;
+    }
+
+    return <Navigate to="/patient" replace />;
+  }
   return (
     <div className="min-h-screen bg-white font-sans">
 
@@ -75,10 +94,25 @@ export default function Landing() {
           </div>
 
           {/* Buttons */}
-          <div className="flex items-center gap-3">
-            <Link to="/login" className="btn-secondary text-sm px-4 py-2">Sign In</Link>
-            <Link to="/register" className="btn-primary text-sm px-4 py-2">Get Started</Link>
-          </div>
+         <div className="flex items-center gap-3">
+  
+    <>
+      <Link
+        to="/login"
+        className="btn-secondary text-sm px-4 py-2"
+      >
+        Sign In
+      </Link>
+
+      <Link
+        to="/register"
+        className="btn-primary text-sm px-4 py-2"
+      >
+        Get Started
+      </Link>
+    </>
+  
+</div>
         </div>
       </nav>
 

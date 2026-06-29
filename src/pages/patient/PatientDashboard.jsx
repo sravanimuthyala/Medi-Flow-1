@@ -65,7 +65,7 @@ export default function PatientDashboard() {
       {/* Welcome banner */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-2xl p-6 text-white">
         <p className="text-blue-200 text-sm mb-1">Good day,</p>
-        <h1 className="text-2xl font-bold mb-2">{user?.name}</h1>
+        <h1 className="text-2xl font-bold mb-2">{user?.fullname}</h1>
         <p className="text-blue-100 text-sm flex items-center gap-2">
           <Activity className="w-4 h-4" />
           {upcoming.length} upcoming appointment{upcoming.length !== 1 ? 's' : ''}

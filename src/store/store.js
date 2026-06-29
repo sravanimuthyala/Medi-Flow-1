@@ -12,28 +12,87 @@
 // ─────────────────────────────────────────────────────────────
 
 export async function login(email, password) {
-  // TODO: Call backend API for login
-  // return await fetch('/api/auth/login', { method: 'POST', body: JSON.stringify({ email, password }) })
-  throw new Error('Backend not connected. Implement login API.')
+  const response = await fetch(
+    "http://localhost:5000/api/auth/login",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        password,
+      }),
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || "Login failed"
+    );
+  }
+
+  return data;
 }
 
 export async function register(userData) {
-  // TODO: Call backend API for registration
-  throw new Error('Backend not connected. Implement register API.')
+  const response = await fetch(
+    "http://localhost:5000/api/auth/register",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || "Registration failed"
+    );
+  }
+
+  return data.user;
 }
 
 export async function logout() {
   // TODO: Call backend API for logout
-  localStorage.removeItem('mf_token')
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
 }
 
 export async function getCurrentUser() {
-  // TODO: Call backend API to get current user
-  return null
+  const token = localStorage.getItem("token");
+
+  console.log("Token:", token);
+
+  const response = await fetch(
+    "http://localhost:5000/api/auth/me",
+    {
+      headers: {
+        Authorization: token
+      }
+    }
+  );
+
+  const data = await response.json();
+
+  console.log("Current User:", data);
+
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
+  return data.user;
 }
 
 export function hasToken() {
-  return !!localStorage.getItem('mf_token')
+  return !!localStorage.getItem('token')
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -59,9 +118,19 @@ export async function getAppointments() {
   return []
 }
 
-export async function getPatientAppointments(patientId) {
-  // TODO: Call backend API
-  return []
+export async function
+getPatientAppointments(
+ patientId
+){
+ const response =
+ await fetch(
+ `http://localhost:5000/api/appointments/patient/${patientId}`
+ );
+
+ const data =
+ await response.json();
+
+ return data;
 }
 
 export async function getDoctorAppointments(doctorId) {
@@ -69,17 +138,49 @@ export async function getDoctorAppointments(doctorId) {
   return []
 }
 
-export async function addAppointment(appointmentData) {
-  // TODO: Call backend API
-  throw new Error('Backend not connected.')
+export async function addAppointment(
+ appointmentData
+){
+ const response =
+ await fetch(
+ "http://localhost:5000/api/appointments",
+ {
+   method:"POST",
+   headers:{
+     "Content-Type":"application/json"
+   },
+   body:JSON.stringify(
+     appointmentData
+   )
+ });
+
+ const data =
+ await response.json();
+
+ if(!response.ok){
+   throw new Error(
+     data.message
+   );
+ }
+
+ return data;
 }
 
 export async function updateAppointmentStatus(id, status) {
   // TODO: Call backend API
 }
 
-export async function cancelAppointment(id) {
-  // TODO: Call backend API
+export async function
+cancelAppointment(id){
+
+ const response =
+ await fetch(
+ `http://localhost:5000/api/appointments/cancel/${id}`,
+ {
+   method:"PUT"
+ });
+
+ return await response.json();
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -87,16 +188,55 @@ export async function cancelAppointment(id) {
 // ─────────────────────────────────────────────────────────────
 
 export async function getRecords(patientId) {
-  // TODO: Call backend API
-  return []
+  const response = await fetch(
+    `http://localhost:5000/api/records/${patientId}`
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
+  return data;
 }
 
 export async function addRecord(recordData) {
-  // TODO: Call backend API
+  const response = await fetch(
+    "http://localhost:5000/api/records",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(recordData),
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
+  return data;
 }
 
 export async function deleteRecord(id) {
-  // TODO: Call backend API
+  const response = await fetch(
+    `http://localhost:5000/api/records/${id}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
+  return data;
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -122,13 +262,30 @@ export async function addPrescription(prescriptionData) {
 // ─────────────────────────────────────────────────────────────
 
 export async function getDoctors() {
-  // TODO: Call backend API
-  return []
+  const response = await fetch(
+    "http://localhost:5000/api/doctors"
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message || "Failed to fetch doctors"
+    );
+  }
+
+  return data;
 }
 
 export async function getDoctorById(id) {
-  // TODO: Call backend API
-  return null
+  const response=await fetch(`http://localhost:5000/api/doctors/${id}`);
+  const data=await response.json();
+  if(!response.ok){
+    throw new Error(
+      data.message || "Doctor Not Found"
+    );
+  }
+  return data;
 }
 
 export async function updateDoctorStatus(id, active) {
@@ -140,8 +297,20 @@ export async function updateDoctorStatus(id, active) {
 // ─────────────────────────────────────────────────────────────
 
 export async function getHospitals() {
-  // TODO: Call backend API
-  return []
+  const response = await fetch(
+    "http://localhost:5000/api/hospitals"
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message ||
+      "Failed to fetch hospitals"
+    );
+  }
+
+  return data;
 }
 
 // ─────────────────────────────────────────────────────────────
