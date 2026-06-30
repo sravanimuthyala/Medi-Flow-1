@@ -25,6 +25,9 @@ require("./routes/appointmentRoutes");
 const recordRoutes =
 require("./routes/recordRoutes");
 
+const emergencyRoutes=
+require("./routes/emergencyRoutes");
+
 app.use("/api/auth", authRoutes);
 
 app.use("/api/doctors", doctorRoutes);
@@ -33,7 +36,6 @@ app.use("/api/hospitals",hospitalRoutes);
 
 app.use("/api/appointments",appointmentRoutes);
 
-app.use(
-  "/api/records",
-  recordRoutes
-);
+app.use("/api/records",recordRoutes);
+
+app.use("/api/emergency", emergencyRoutes);

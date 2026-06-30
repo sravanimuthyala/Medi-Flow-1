@@ -318,6 +318,17 @@ export async function getHospitals() {
 // ─────────────────────────────────────────────────────────────
 
 export async function getEmergencyResources() {
-  // TODO: Call backend API
-  return []
+  const response=await fetch(
+    "http://localhost:5000/api/emergency"
+  );
+  const data=await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      data.message ||
+      "Failed to fetch emergencyResources"
+    );
+  }
+
+  return data;
 }

@@ -5,11 +5,32 @@
  * No login required - accessible to everyone for emergencies.
  */
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { getEmergencyResources,getHospitals } from '../../store/store.js'
 import { AlertTriangle, Phone, MapPin, Activity, Wind, Droplet, User, Check, X } from 'lucide-react'
-import { hospitals, emergencyResources } from '../../data/mockData.js'
+// import { hospitals, emergencyResources } from '../../data/mockData.js'
 
 export default function EmergencyResources() {
+  const [resources, setResources] = useState([]);
+  const [hospitals, setHospitals] = useState([]);
+useEffect(() => {
+  async function loadData() {
+    try {
+      const [emergencyData, hospitalData] =
+        await Promise.all([
+          getEmergencyResources(),
+          getHospitals()
+        ]);
+
+      setResources(emergencyData);
+      setHospitals(hospitalData);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  loadData();
+}, []);
   const [selectedHospital, setSelected] = useState('')
   const [bloodFilter, setBloodFilter] = useState('')
 
@@ -19,9 +40,11 @@ export default function EmergencyResources() {
   )
 
   // Get emergency data for a hospital
-  function getEmergencyData(hospitalId) {
-    return emergencyResources.find(e => e.hospitalId === hospitalId)
-  }
+function getEmergencyData(hospitalId) {
+  return resources.find(
+    r => r.hospital_id == hospitalId
+  );
+}
 
   // Check if blood type is available
   function bloodAvailable(data, type) {
@@ -112,10 +135,10 @@ export default function EmergencyResources() {
                         ICU Beds
                       </div>
                       <div className="text-xl font-bold text-gray-900">
-                        {data.icuAvailable}/{data.icuTotal}
+                        {data.icu_available}/{data.icu_total}
                       </div>
                       <div className="text-xs text-gray-500">available</div>
-                      {data.icuAvailable <= 2 && (
+                      {data.icu_available <= 2 && (
                         <span className="text-xs text-red-600 font-medium">Critical</span>
                       )}
                     </div>
@@ -127,10 +150,10 @@ export default function EmergencyResources() {
                         Ventilators
                       </div>
                       <div className="text-xl font-bold text-gray-900">
-                        {data.ventAvailable}/{data.ventTotal}
+                        {data.vent_available}/{data.vent_total}
                       </div>
                       <div className="text-xs text-gray-500">available</div>
-                      {data.ventAvailable === 0 && (
+                      {data.vent_available === 0 && (
                         <span className="text-xs text-red-600 font-medium">None available</span>
                       )}
                     </div>
@@ -142,7 +165,7 @@ export default function EmergencyResources() {
                       <User className="w-4 h-4" />
                       Emergency Doctors
                     </div>
-                    <span className="font-bold text-gray-900">{data.emergencyDocs} on duty</span>
+                    <span className="font-bold text-gray-900">{data.emergency_docs} on duty</span>
                   </div>
 
                   {/* Anesthesia availability */}
