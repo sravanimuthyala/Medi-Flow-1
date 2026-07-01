@@ -8,7 +8,7 @@ const getRecords = async (req, res) => {
       `SELECT * FROM medical_records
        WHERE patient_id=$1
        ORDER BY date DESC`,
-      [patientId]
+      [patientId],
     );
 
     res.json(result.rows);
@@ -23,32 +23,17 @@ const getRecords = async (req, res) => {
 
 const addRecord = async (req, res) => {
   try {
-    const {
-      patientId,
-      title,
-      description,
-      type,
-      date,
-    } = req.body;
+    const { patientId, title, description, type, date } = req.body;
 
     const result = await pool.query(
       `INSERT INTO medical_records
       (patient_id,title,description,type,date)
       VALUES($1,$2,$3,$4,$5)
       RETURNING *`,
-      [
-        patientId,
-        title,
-        description,
-        type,
-        date,
-      ]
+      [patientId, title, description, type, date],
     );
 
-    res.status(201).json(
-      result.rows[0]
-    );
-
+    res.status(201).json(result.rows[0]);
   } catch (error) {
     console.log(error);
 
@@ -62,15 +47,11 @@ const deleteRecord = async (req, res) => {
   try {
     const { id } = req.params;
 
-    await pool.query(
-      "DELETE FROM medical_records WHERE id=$1",
-      [id]
-    );
+    await pool.query("DELETE FROM medical_records WHERE id=$1", [id]);
 
     res.json({
       message: "Record Deleted",
     });
-
   } catch (error) {
     console.log(error);
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Calendar, Clock, CheckCircle, XCircle, Loader } from 'lucide-react'
-import { getDoctorAppointments, updateAppointmentStatus } from '../../store/store.js'
+import { getDoctorAppointments, updateAppointmentStatus,getDoctorSlots,updateDoctorSlots } from '../../store/store.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
@@ -19,10 +19,30 @@ export default function DoctorSchedule() {
   const [currentDate, setCurrentDate] = useState(new Date())
   const [selectedDay, setSelectedDay] = useState(null)
   const [allAppts, setAllAppts] = useState([])
-
+const [slots, setSlots] = useState({})
+const [newSlot, setNewSlot] = useState("")
   const year = currentDate.getFullYear()
   const month = currentDate.getMonth()
+const WEEK_DAYS = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday"
+]
 
+const selectedWeekDay =
+  selectedDay
+    ? WEEK_DAYS[
+        new Date(
+          year,
+          month,
+          selectedDay
+        ).getDay()
+      ]
+    : null
   // Fetch appointments from backend
   useEffect(() => {
     async function fetchData() {
@@ -31,6 +51,14 @@ export default function DoctorSchedule() {
         setLoading(true)
         const appts = await getDoctorAppointments(user.id)
         setAllAppts(appts)
+        const slotData =
+  await getDoctorSlots(user.id);
+
+if (slotData?.slots) {
+  setSlots(slotData.slots)
+} else {
+  setSlots([])
+}
       } catch (e) {
         console.error('Failed to load appointments:', e)
       } finally {
@@ -60,6 +88,40 @@ export default function DoctorSchedule() {
       console.error('Failed to update:', e)
     }
   }
+
+async function saveSlots() {
+  console.log("Saving:", slots);
+  await updateDoctorSlots(
+    user.id,
+    slots
+  );
+
+  alert("Slots Updated");
+}
+
+function addSlot() {
+  if (!newSlot || !selectedWeekDay) return
+
+  setSlots({
+    ...slots,
+    [selectedWeekDay]: [
+      ...(slots[selectedWeekDay] || []),
+      newSlot
+    ]
+  })
+
+  setNewSlot("")
+}
+
+function removeSlot(index) {
+  setSlots({
+    ...slots,
+    [selectedWeekDay]:
+      slots[selectedWeekDay].filter(
+        (_, i) => i !== index
+      )
+  })
+}
 
   const selectedAppts = selectedDay ? getAppts(selectedDay) : []
 
@@ -147,7 +209,60 @@ export default function DoctorSchedule() {
             <Calendar className="w-5 h-5 text-teal-600" />
             {selectedDay ? `${MONTHS[month]} ${selectedDay}` : 'Select a day'}
           </h3>
+           <div className="mb-4 border-b border-gray-100 pb-4">
+  <h4 className="font-semibold text-gray-900 mb-2">
+    Available Slots
+  </h4>
+  <p className="text-sm text-gray-500 mb-2">
+  {selectedWeekDay || "Select a day"}
+</p>
 
+  <div className="flex gap-2 mb-3">
+    <input
+      type="time"
+      value={newSlot}
+      onChange={(e) =>
+        setNewSlot(e.target.value)
+      }
+      className="input"
+    />
+
+    <button
+      onClick={addSlot}
+      className="btn-primary"
+    >
+      Add
+    </button>
+  </div>
+
+  <div className="flex flex-wrap gap-2">
+    {selectedWeekDay &&
+ slots[selectedWeekDay]?.map(
+  (slot, index) => (
+      <div
+        key={index}
+        className="bg-teal-100 text-teal-700 px-3 py-1 rounded-full flex items-center gap-2"
+      >
+        {slot}
+
+        <button
+          onClick={() =>
+            removeSlot(index)
+          }
+          className="font-bold"
+        >
+          ×
+        </button>
+      </div>
+    ))}
+  </div>
+  <button
+  onClick={saveSlots}
+  className="btn-primary mt-3"
+>
+  Save Slots
+</button>
+</div>
           {!selectedDay && (
             <p className="text-gray-400 text-sm text-center py-10">Click on a date to view appointments</p>
           )}

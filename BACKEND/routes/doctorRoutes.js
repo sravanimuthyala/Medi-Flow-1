@@ -4,9 +4,14 @@ const router = express.Router();
 
 const {
   getDoctors,
-  getDoctorById
+  getDoctorById,
+   getDoctorSlots,
+  updateDoctorSlots,
 } = require("../controllers/doctorController");
 
 router.get("/", getDoctors);
-router.get("/:id",getDoctorById)
+router.get("/slots/:id", getDoctorSlots);
+
+router.put("/slots/:id", updateDoctorSlots);
+router.get("/:id", getDoctorById);
 module.exports = router;

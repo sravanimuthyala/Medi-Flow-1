@@ -277,6 +277,32 @@ export async function getDoctors() {
   return data;
 }
 
+export async function getDoctorSlots(id) {
+  const response = await fetch(
+    `http://localhost:5000/api/doctors/slots/${id}`
+  );
+
+  return await response.json();
+}
+
+export async function updateDoctorSlots(
+  id,
+  slots
+) {
+  const response = await fetch(
+    `http://localhost:5000/api/doctors/slots/${id}`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ slots }),
+    }
+  );
+
+  return await response.json();
+}
+
 export async function getDoctorById(id) {
   const response=await fetch(`http://localhost:5000/api/doctors/${id}`);
   const data=await response.json();

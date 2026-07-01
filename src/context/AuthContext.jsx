@@ -77,21 +77,22 @@ export function AuthProvider({ children }) {
 }
 
   // ── Register (async) ─────────────────────────────────────────
-  async function register(fullname, email, password, role, phone) {
-    try {
-      const newUser = await apiRegister({
-        fullname,
-        email,
-        password,
-        role,
-        phone: phone || '',
-      })
-      setUser(newUser)
-      return { error: null }
-    } catch (e) {
-      return { error: e.message || 'Registration failed. Please try again.' }
-    }
+  async function register(userData) {
+  try {
+    const newUser =
+      await apiRegister(userData);
+
+    setUser(newUser);
+
+    return { error: null };
+  } catch (e) {
+    return {
+      error:
+        e.message ||
+        "Registration failed"
+    };
   }
+}
 
   // ── Sign Out (async) ──────────────────────────────────────────
   async function signOut() {

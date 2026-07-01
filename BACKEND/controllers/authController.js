@@ -3,8 +3,21 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const register = async (req, res) => {
   try {
-    const { fullname, email, password, role, phone } = req.body;
-
+const {
+  fullname,
+  email,
+  password,
+  role,
+  phone,
+  specialization,
+  department,
+  qualification,
+  experience,
+  fee,
+  hospitalId,
+  bio,
+  image
+} = req.body;
     if (!fullname || !email || !password || !role) {
       return res.status(400).json({
         message: "All fields required",
@@ -25,12 +38,52 @@ const register = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await pool.query(
-      `INSERT INTO users
-      (fullname,email,password,role,phone)
-      VALUES($1,$2,$3,$4,$5)
-      RETURNING id,fullname,email,role`,
-      [fullname, email, hashedPassword, role, phone],
-    );
+  `INSERT INTO users
+  (fullname,email,password,role,phone)
+  VALUES($1,$2,$3,$4,$5)
+  RETURNING id,fullname,email,role`,
+  [fullname, email, hashedPassword, role, phone]
+);
+
+if (role === "doctor") {
+  await pool.query(
+    `INSERT INTO doctors
+    (
+      name,
+      email,
+      phone,
+      specialization,
+      department,
+      hospital_id,
+      qualification,
+      experience,
+      fee,
+      rating,
+      image,
+      bio,
+      user_id
+    )
+    VALUES
+    (
+      $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13
+    )`,
+    [
+      fullname,
+      email,
+      phone,
+      specialization,
+      department,
+      hospitalId,
+      qualification,
+      experience,
+      fee,
+      0,
+      image,
+      bio,
+      result.rows[0].id
+    ]
+  );
+}
 
     res.status(201).json({
       message: "User Registered Successfully",
@@ -103,7 +156,7 @@ const getCurrentUser = async (req, res) => {
       `SELECT id,fullname,email,role,phone
        FROM users
        WHERE id=$1`,
-      [req.user.id]
+      [req.user.id],
     );
 
     if (result.rows.length === 0) {
@@ -115,7 +168,6 @@ const getCurrentUser = async (req, res) => {
     res.json({
       user: result.rows[0],
     });
-
   } catch (error) {
     console.log(error);
 
@@ -125,6 +177,4 @@ const getCurrentUser = async (req, res) => {
   }
 };
 
-
-
-module.exports = { register, login, getCurrentUser,};
+module.exports = { register, login, getCurrentUser };

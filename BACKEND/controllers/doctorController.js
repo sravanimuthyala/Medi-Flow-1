@@ -30,4 +30,51 @@ const getDoctorById = async (req, res) => {
     });
   }
 };
-module.exports = { getDoctors ,getDoctorById};
+const getDoctorSlots = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+   
+
+    const result = await pool.query(
+      `SELECT slots
+       FROM doctors
+       WHERE user_id = $1`,
+      [id]
+    );
+
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};
+
+const updateDoctorSlots = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { slots } = req.body;
+
+    await pool.query(
+      `UPDATE doctors
+       SET slots = $1
+       WHERE user_id = $2`,
+      [JSON.stringify(slots), id]
+    );
+
+    res.json({
+      message: "Slots Updated",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};
+module.exports = { getDoctors, getDoctorById, getDoctorSlots, updateDoctorSlots };
