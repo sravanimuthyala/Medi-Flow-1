@@ -6,12 +6,12 @@ const {
   getDoctors,
   getDoctorById,
    getDoctorSlots,
-  updateDoctorSlots,
+  updateDoctorSlots,getDoctorAppointments,updateAppointmentStatus
 } = require("../controllers/doctorController");
 
 router.get("/", getDoctors);
 router.get("/slots/:id", getDoctorSlots);
-
+router.get("/doctor/:id", getDoctorAppointments);
 router.put("/slots/:id", updateDoctorSlots);
-router.get("/:id", getDoctorById);
+router.put("/appointments/:id/status", updateAppointmentStatus);router.get("/:id", getDoctorById);
 module.exports = router;

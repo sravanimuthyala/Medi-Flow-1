@@ -61,7 +61,6 @@ export async function register(userData) {
 }
 
 export async function logout() {
-  // TODO: Call backend API for logout
   localStorage.removeItem("token");
   localStorage.removeItem("role");
 }
@@ -100,8 +99,11 @@ export function hasToken() {
 // ─────────────────────────────────────────────────────────────
 
 export async function getUsers() {
-  // TODO: Call backend API
-  return []
+ const response = await fetch(
+   "http://localhost:5000/api/admin/users"
+ );
+  const data = await response.json();
+  return data;
 }
 
 export async function getUserById(id) {
@@ -114,8 +116,11 @@ export async function getUserById(id) {
 // ─────────────────────────────────────────────────────────────
 
 export async function getAppointments() {
-  // TODO: Call backend API
-  return []
+const response = await fetch(
+  "http://localhost:5000/api/admin/appointments"
+);
+  const data = await response.json();
+  return data;
 }
 
 export async function
@@ -134,8 +139,11 @@ getPatientAppointments(
 }
 
 export async function getDoctorAppointments(doctorId) {
-  // TODO: Call backend API
-  return []
+  const response = await fetch(
+    `http://localhost:5000/api/appointments/doctor/${doctorId}`
+  );
+
+  return await response.json();
 }
 
 export async function addAppointment(
@@ -167,9 +175,25 @@ export async function addAppointment(
 }
 
 export async function updateAppointmentStatus(id, status) {
-  // TODO: Call backend API
-}
+  const response = await fetch(
+    `http://localhost:5000/api/doctors/appointments/${id}/status`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ status }),
+    }
+  );
 
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
+  return data;
+}
 export async function
 cancelAppointment(id){
 
@@ -244,17 +268,46 @@ export async function deleteRecord(id) {
 // ─────────────────────────────────────────────────────────────
 
 export async function getPrescriptions() {
-  // TODO: Call backend API
-  return []
+  const response = await fetch(
+    "http://localhost:5000/api/prescriptions"
+  )
+
+  return await response.json()
 }
 
-export async function getPatientPrescriptions(patientId) {
-  // TODO: Call backend API
-  return []
+export async function getPatientPrescriptions(
+  patientId
+) {
+  const response = await fetch(
+    `http://localhost:5000/api/prescriptions/patient/${patientId}`
+  )
+
+  return await response.json()
 }
 
-export async function addPrescription(prescriptionData) {
-  // TODO: Call backend API
+export async function addPrescription(
+  prescriptionData
+) {
+  const response = await fetch(
+    "http://localhost:5000/api/prescriptions",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(
+        prescriptionData
+      )
+    }
+  )
+
+  const data = await response.json()
+
+  if (!response.ok) {
+    throw new Error(data.message)
+  }
+
+  return data
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -315,7 +368,18 @@ export async function getDoctorById(id) {
 }
 
 export async function updateDoctorStatus(id, active) {
-  // TODO: Call backend API
+  const response = await fetch(
+    `http://localhost:5000/api/admin/doctors/${id}/status`,
+    {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ active }),
+    }
+  );
+
+  return await response.json();
 }
 
 // ─────────────────────────────────────────────────────────────

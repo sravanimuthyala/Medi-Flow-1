@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Calendar, Search, Loader } from 'lucide-react'
-import { getAppointments, updateAppointmentStatus, getDoctors } from '../../store/store.js'
+import { getAppointments, updateAppointmentStatus} from '../../store/store.js'
 
 const statusBadge = {
   pending:   'badge-yellow',
@@ -14,19 +14,15 @@ export default function AppointmentMonitoring() {
   const [statusFilter, setStatus] = useState('')
   const [loading, setLoading] = useState(true)
   const [appointments, setAppointments] = useState([])
-  const [doctors, setDoctors] = useState([])
 
   // Fetch data from backend
   useEffect(() => {
     async function fetchData() {
       try {
         setLoading(true)
-        const [appts, docs] = await Promise.all([
-          getAppointments(),
-          getDoctors(),
-        ])
+       const appts = await getAppointments();
+setAppointments(appts);
         setAppointments(appts)
-        setDoctors(docs)
       } catch (e) {
         console.error('Failed to load data:', e)
       } finally {
@@ -48,8 +44,7 @@ export default function AppointmentMonitoring() {
   }
 
   const filtered = appointments.filter(a => {
-    const doc = doctors.find(d => d.id === a.doctorId)
-    const matchSearch = !search || doc?.name.toLowerCase().includes(search.toLowerCase())
+    const matchSearch = !search || a.doctor_name.toLowerCase().includes(search.toLowerCase())
     const matchStatus = !statusFilter || a.status === statusFilter
     return matchSearch && matchStatus
   })
@@ -101,11 +96,10 @@ export default function AppointmentMonitoring() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {filtered.map(appt => {
-                const doc = doctors.find(d => d.id === appt.doctorId)
                 return (
                   <tr key={appt.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-4 py-3 font-medium text-gray-900">#{appt.patientId?.slice(-6)}</td>
-                    <td className="px-4 py-3 text-gray-600">{doc?.name || '—'}</td>
+                    <td className="px-4 py-3 font-medium text-gray-900">#{appt.patient_name}</td>
+                    <td className="px-4 py-3 text-gray-600">{appt.doctor_name}</td>
                     <td className="px-4 py-3 text-gray-500">{appt.date}</td>
                     <td className="px-4 py-3 text-gray-500">{appt.time}</td>
                     <td className="px-4 py-3 text-gray-500 capitalize">{appt.type}</td>

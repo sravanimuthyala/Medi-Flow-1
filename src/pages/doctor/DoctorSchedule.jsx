@@ -73,13 +73,21 @@ if (slotData?.slots) {
   const daysInMonth = new Date(year, month + 1, 0).getDate()
 
   // Get appointments for a specific day number
-  function getAppts(day) {
-    const dateStr = `${year}-${String(month + 1).padStart(2,'0')}-${String(day).padStart(2,'0')}`
-    return allAppts.filter(a => a.date === dateStr)
-  }
+ function getAppts(day) {
+  return allAppts.filter(a => {
+    const apptDate = new Date(a.date)
+
+    return (
+      apptDate.getDate() === day &&
+      apptDate.getMonth() === month &&
+      apptDate.getFullYear() === year
+    )
+  })
+}
 
   async function markStatus(id, status) {
     try {
+      console.log(id, status)
       await updateAppointmentStatus(id, status)
       // Refresh appointments
       const updated = await getDoctorAppointments(user.id)

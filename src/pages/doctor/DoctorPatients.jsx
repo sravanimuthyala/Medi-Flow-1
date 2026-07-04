@@ -80,14 +80,13 @@ export default function DoctorPatients() {
         </div>
       ) : (
         <div className="grid sm:grid-cols-2 gap-4">
-          {filtered.map(p => {
+          {filtered.map((p,index) => {
             const isSelected = selected === p.patientId
             const lastAppt = p.appointments[p.appointments.length - 1]
 
             return (
               <button
-                key={p.patientId}
-                onClick={() => setSelected(isSelected ? null : p.patientId)}
+                key={`${p.patientId}-${index}`}                onClick={() => setSelected(isSelected ? null : p.patientId)}
                 className={`card text-left hover:shadow-md transition-all border-2 ${
                   isSelected ? 'border-teal-400' : 'border-gray-100'
                 }`}

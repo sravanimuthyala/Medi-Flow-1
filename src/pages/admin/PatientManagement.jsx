@@ -30,12 +30,12 @@ export default function PatientManagement() {
 
   // Count appointments per patient
   function apptCount(id) {
-    return appointments.filter(a => a.patientId === id).length
+    return appointments.filter(a => a.patient_id === id).length
   }
 
   const filtered = patients.filter(p =>
     !search ||
-    p.name.toLowerCase().includes(search.toLowerCase()) ||
+    p.fullname.toLowerCase().includes(search.toLowerCase()) ||
     p.email.toLowerCase().includes(search.toLowerCase())
   )
 
@@ -78,9 +78,9 @@ export default function PatientManagement() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold text-sm flex-shrink-0">
-                        {p.name.charAt(0)}
+                        {p.fullname.charAt(0)}
                       </div>
-                      <p className="font-medium text-gray-900">{p.name}</p>
+                      <p className="font-medium text-gray-900">{p.fullname}</p>
                     </div>
                   </td>
                   <td className="px-4 py-3 text-gray-500 flex items-center gap-1.5 mt-3">

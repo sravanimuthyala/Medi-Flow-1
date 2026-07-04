@@ -77,4 +77,52 @@ const updateDoctorSlots = async (req, res) => {
     });
   }
 };
-module.exports = { getDoctors, getDoctorById, getDoctorSlots, updateDoctorSlots };
+
+const getDoctorAppointments = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `SELECT *
+       FROM appointments
+       WHERE doctor_id = $1
+       ORDER BY date`,
+      [id]
+    );
+
+    res.json(result.rows);
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};
+
+const updateAppointmentStatus = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { status } = req.body;
+
+    await pool.query(
+      `UPDATE appointments
+       SET status = $1
+       WHERE id = $2`,
+      [status, id]
+    );
+
+    res.json({
+      message: "Status Updated"
+    });
+
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error"
+    });
+  }
+};
+
+module.exports = { getDoctors, getDoctorById, getDoctorSlots, updateDoctorSlots ,getDoctorAppointments, updateAppointmentStatus};

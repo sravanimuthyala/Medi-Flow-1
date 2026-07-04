@@ -50,12 +50,18 @@ export default function DoctorPrescriptions() {
   // ── Save prescription (async) ──────────────────────────────
   async function handleSave(e) {
     e.preventDefault()
-    const appt = appointments.find(a => a.id === appointmentId)
+    const appt = appointments.find(a => a.id === Number(appointmentId))
     if (!appt) return
 
     setSaving(true)
 
     try {
+       console.log({
+    appointmentId,
+    diagnosis,
+    notes,
+    meds
+  });
       await addPrescription({
         appointmentId,
         patientId: appt.patientId,
@@ -175,7 +181,7 @@ export default function DoctorPrescriptions() {
 
               <div className="flex gap-3 pt-1">
                 <button type="button" onClick={() => setShowForm(false)} className="btn-secondary flex-1">Cancel</button>
-                <button type="submit" disabled={saving} className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition-all disabled:opacity-50">
+                <button onClick={handleSave} type="submit" disabled={saving} className="flex-1 inline-flex items-center justify-center gap-2 px-5 py-2.5 bg-teal-600 hover:bg-teal-700 text-white font-medium rounded-lg transition-all disabled:opacity-50">
                   {saving ? <Loader className="w-4 h-4 animate-spin" /> : 'Save Prescription'}
                 </button>
               </div>

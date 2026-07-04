@@ -22,6 +22,14 @@ const recordRoutes = require("./routes/recordRoutes");
 
 const emergencyRoutes = require("./routes/emergencyRoutes");
 
+const prescriptionRoutes = require("./routes/prescriptionRoutes");
+
+const adminRoutes = require("./routes/adminRoutes");
+
+app.use("/api/admin", adminRoutes);
+
+app.use("/api/prescriptions",  prescriptionRoutes);
+
 app.use("/api/auth", authRoutes);
 
 app.use("/api/doctors", doctorRoutes);
