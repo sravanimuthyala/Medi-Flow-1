@@ -24,6 +24,17 @@ const {
       });
     }
 
+      if(role === "admin"){
+      const adminExists = await pool.query(
+        "SELECT * FROM users WHERE role='admin'"
+      );
+      if (adminExists.rows.length > 0) {
+        return res.status(400).json({
+          message: "An admin account already exists. Only one admin is allowed.",
+        });
+      }
+    }
+
     const existingUser = await pool.query(
       "SELECT * FROM users WHERE email=$1",
       [email],
