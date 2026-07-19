@@ -33,7 +33,9 @@ export function AuthProvider({ children }) {
         const currentUser =
           await getCurrentUser();
 
-        console.log(currentUser);
+        setUser(currentUser);
+      } catch (e) {
+        console.log(e);
 
         setUser(currentUser);
       } catch (e) {
