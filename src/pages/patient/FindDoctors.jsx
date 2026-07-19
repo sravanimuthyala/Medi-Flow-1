@@ -15,35 +15,55 @@ export default function FindDoctors() {
 
   // Fetch doctors and hospitals from backend on mount
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const [doctorsData, hospitalsData] = await Promise.all([
-          getDoctors(),
-          getHospitals(),
-        ])
-        setDoctors(doctorsData)
-        setHospitals(hospitalsData)
-      } catch (e) {
-        setError('Failed to load doctors. Please try again.')
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [])
+  async function fetchData() {
+    try {
+      setLoading(true)
 
+      const hospitalsData = await getHospitals()
+
+      setHospitals(hospitalsData)
+    } catch (e) {
+      setError('Failed to load data. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+    }
+
+  fetchData()
+}, [])
+
+useEffect(() => {
+  const timer = setTimeout(async () => {
+    try {
+      const doctorsData = await getDoctors(
+        search,
+        filterSpec
+      )
+
+      setDoctors(doctorsData)
+    } catch (e) {
+      console.error('Failed to fetch doctors', e)
+    }
+  }, 500)
+
+  return () => clearTimeout(timer)
+}, [search, filterSpec])
   // Get unique specializations for the dropdown
   const specializations = [...new Set(doctors.map(d => d.specialization))]
 
   // Filter doctors based on search inputs
-  const filtered = doctors.filter(doc => {
-    const matchSearch   = !search || doc.name.toLowerCase().includes(search.toLowerCase()) || doc.specialization.toLowerCase().includes(search.toLowerCase())
-    const matchHospital = !filterHospital || doc.hospitalId === filterHospital
-    const matchSpec     = !filterSpec || doc.specialization === filterSpec
-    return matchSearch && matchHospital && matchSpec
-  })
+   // Filter doctors by hospital and specialization
+const filtered = doctors.filter(doc => {
+  const matchHospital =
+    !filterHospital ||
+    String(doc.hospitalId) === String(filterHospital)
 
+
+
+  return matchHospital 
+})
+
+  
   // Clear all filters
   function clearFilters() {
     setSearch('')

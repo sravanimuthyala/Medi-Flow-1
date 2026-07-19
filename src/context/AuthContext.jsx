@@ -26,49 +26,75 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true) // true while checking auth
 
   // On app start: check if user has a valid token
-  useEffect(() => {
-    async function checkAuth() {
-      if (hasToken()) {
-        try {
-          const currentUser = await getCurrentUser()
-          setUser(currentUser)
-        } catch (e) {
-          // Token invalid or expired
-          setUser(null)
-        }
+ useEffect(() => {
+  async function checkAuth() {
+    if (hasToken()) {
+      try {
+        const currentUser =
+          await getCurrentUser();
+
+        setUser(currentUser);
+      } catch (e) {
+        console.log(e);
+
+        setUser(currentUser);
+      } catch (e) {
+        console.log(e);
+        setUser(null);
       }
-      setLoading(false)
     }
-    checkAuth()
-  }, [])
+
+    setLoading(false);
+  }
+
+  checkAuth();
+}, []);
 
   // ── Sign In (async) ──────────────────────────────────────────
-  async function signIn(email, password) {
-    try {
-      const loggedInUser = await apiLogin(email, password)
-      setUser(loggedInUser)
-      return { error: null }
-    } catch (e) {
-      return { error: e.message || 'Login failed. Please try again.' }
+ async function signIn(email, password) {
+  try {
+    const data = await apiLogin(email, password)
+
+    localStorage.setItem(
+      "token",
+      data.token
+    )
+
+    localStorage.setItem(
+      "role",
+      data.user.role
+    )
+
+    setUser(data.user)
+
+    return { error: null }
+
+  } catch (e) {
+    return {
+      error:
+        e.message ||
+        "Login failed. Please try again."
     }
   }
+}
 
   // ── Register (async) ─────────────────────────────────────────
-  async function register(name, email, password, role, phone) {
-    try {
-      const newUser = await apiRegister({
-        name,
-        email,
-        password,
-        role,
-        phone: phone || '',
-      })
-      setUser(newUser)
-      return { error: null }
-    } catch (e) {
-      return { error: e.message || 'Registration failed. Please try again.' }
-    }
+  async function register(userData) {
+  try {
+    const newUser =
+      await apiRegister(userData);
+
+    setUser(newUser);
+
+    return { error: null };
+  } catch (e) {
+    return {
+      error:
+        e.message ||
+        "Registration failed"
+    };
   }
+}
 
   // ── Sign Out (async) ──────────────────────────────────────────
   async function signOut() {

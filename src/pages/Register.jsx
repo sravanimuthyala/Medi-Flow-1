@@ -23,6 +23,14 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [specialization, setSpecialization] = useState('')
+  const [department, setDepartment] = useState('')
+  const [qualification, setQualification] = useState('')
+  const [experience, setExperience] = useState('')
+  const [fee, setFee] = useState('')
+  const [hospitalId, setHospitalId] = useState('')
+  const [bio, setBio] = useState('')
+  const [image, setImage] = useState('')
 
   // ── Handle form submit (async) ─────────────────────────────
   async function handleSubmit(e) {
@@ -30,10 +38,25 @@ export default function Register() {
     setLoading(true)
     setError('')
 
-    const result = await register(name, email, password, role, phone)
-
+const result = await register({
+  fullname: name,
+  email,
+  password,
+  role,
+  phone,
+  specialization,
+  department,
+  qualification,
+  experience,
+  fee,
+  hospitalId,
+  bio,
+  image
+});
     if (result.error) {
+      console.log(result)
       setError(result.error)
+
       setLoading(false)
       return
     }
@@ -115,7 +138,82 @@ export default function Register() {
                 <input type="tel" className="input" placeholder="+91-XXXXXXXXXX" value={phone} onChange={e => setPhone(e.target.value)} />
               </div>
             </div>
+              {role === 'doctor' && (
+  <div className="space-y-4 border-t pt-4">
+    <h3 className="font-semibold text-gray-800">
+      Doctor Information
+    </h3>
 
+    <input
+      type="text"
+      className="input"
+      placeholder="Specialization"
+      value={specialization}
+      onChange={(e) => setSpecialization(e.target.value)}
+      required
+    />
+
+    <input
+      type="text"
+      className="input"
+      placeholder="Department"
+      value={department}
+      onChange={(e) => setDepartment(e.target.value)}
+      required
+    />
+
+    <input
+      type="text"
+      className="input"
+      placeholder="Qualification"
+      value={qualification}
+      onChange={(e) => setQualification(e.target.value)}
+      required
+    />
+
+    <input
+      type="number"
+      className="input"
+      placeholder="Experience (Years)"
+      value={experience}
+      onChange={(e) => setExperience(e.target.value)}
+      required
+    />
+
+    <input
+      type="number"
+      className="input"
+      placeholder="Consultation Fee"
+      value={fee}
+      onChange={(e) => setFee(e.target.value)}
+      required
+    />
+
+    <input
+      type="number"
+      className="input"
+      placeholder="Hospital ID"
+      value={hospitalId}
+      onChange={(e) => setHospitalId(e.target.value)}
+      required
+    />
+
+    <input
+      type="text"
+      className="input"
+      placeholder="Profile Image URL"
+      value={image}
+      onChange={(e) => setImage(e.target.value)}
+    />
+
+    <textarea
+      className="input min-h-[100px]"
+      placeholder="Doctor Bio"
+      value={bio}
+      onChange={(e) => setBio(e.target.value)}
+    />
+  </div>
+)}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1.5">Password</label>
               <div className="relative">

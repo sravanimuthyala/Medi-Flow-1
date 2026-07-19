@@ -74,7 +74,7 @@ export default function PatientLayout() {
               <User className="w-4 h-4 text-blue-600" />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-medium text-gray-900 truncate">{user?.name}</p>
+              <p className="text-sm font-medium text-gray-900 truncate">{user?.fullname}</p>
               <p className="text-xs text-gray-500">Patient</p>
             </div>
           </div>

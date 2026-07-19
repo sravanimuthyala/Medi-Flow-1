@@ -112,13 +112,7 @@ export default function Login() {
         </div>
 
         {/* Backend setup hint */}
-        <div className="mt-5 bg-amber-50 rounded-xl border border-amber-100 p-4 text-sm">
-          <p className="font-semibold text-amber-700 mb-2">Backend Integration</p>
-          <p className="text-amber-600 text-xs">
-            Connect your backend API by setting VITE_API_URL in .env file.
-            Default: http://localhost:5000/api
-          </p>
-        </div>
+       
       </div>
     </div>
   )
