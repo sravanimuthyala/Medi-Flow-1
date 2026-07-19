@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Search, Star, Plus, Loader } from 'lucide-react'
-import { getDoctors, updateDoctorStatus, getHospitals } from '../../store/store.js'
+import {  updateDoctorStatus, getHospitals ,getAllDoctors} from '../../store/store.js'
 
 export default function DoctorManagement() {
   const [loading, setLoading] = useState(true)
@@ -11,25 +11,36 @@ export default function DoctorManagement() {
 
   // Fetch data from backend
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const [doctors, hosp] = await Promise.all([
-          getDoctors(),
-          getHospitals(),
-        ])
-        // Add active status to doctors if not present
-        setDocList(doctors.map(d => ({ ...d, active: d.active ?? true })))
-        setHospitals(hosp)
-      } catch (e) {
-        console.error('Failed to load doctors:', e)
-      } finally {
-        setLoading(false)
-      }
-    }
-    fetchData()
-  }, [])
+  async function fetchHospitals() {
+    try {
+      setLoading(true);
 
+      const hosp = await getHospitals();
+
+      setHospitals(hosp);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  fetchHospitals();
+}, []);
+
+useEffect(() => {
+  const timer = setTimeout(async () => {
+    try {
+      const doctors = await getAllDoctors(search);
+
+      setDocList(doctors);
+    } catch (e) {
+      console.error("Failed to fetch doctors", e);
+    }
+     }, 500);
+
+    return () => clearTimeout(timer);
+}, [search]);
   async function toggleActive(id) {
     try {
       const doc = docList.find(d => d.id === id)
@@ -45,12 +56,8 @@ export default function DoctorManagement() {
     }
   }
 
-  const filtered = docList.filter(d =>
-    !search ||
-    d.name.toLowerCase().includes(search.toLowerCase()) ||
-    d.specialization.toLowerCase().includes(search.toLowerCase())
-  )
-
+ 
+  
   // Loading state
   if (loading) {
     return (
@@ -98,7 +105,7 @@ export default function DoctorManagement() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filtered.map(doc => {
+              {doclist.map(doc => {
                 const hosp = hospitals.find(h => h.id === doc.hospitalId)
                 return (
                   <tr key={doc.id} className="hover:bg-gray-50 transition-colors">
