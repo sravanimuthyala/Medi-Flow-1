@@ -68,8 +68,8 @@ export async function logout() {
 export async function getCurrentUser() {
   const token = localStorage.getItem("token");
 
-  console.log("Token:", token);
 
+  
   const response = await fetch(
     "http://localhost:5000/api/auth/me",
     {
@@ -81,8 +81,7 @@ export async function getCurrentUser() {
 
   const data = await response.json();
 
-  console.log("Current User:", data);
-
+  
   if (!response.ok) {
     throw new Error(data.message);
   }
@@ -98,11 +97,23 @@ export function hasToken() {
 // USERS
 // ─────────────────────────────────────────────────────────────
 
-export async function getUsers() {
- const response = await fetch(
-   "http://localhost:5000/api/admin/users"
- );
+export async function getUsers(search = "") {
+  const params = new URLSearchParams();
+
+  if (search) {
+    params.append("search", search);
+  }
+
+  const response = await fetch(
+    `http://localhost:5000/api/admin/users?${params.toString()}`
+  );
+
   const data = await response.json();
+  
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
   return data;
 }
 
@@ -115,14 +126,29 @@ export async function getUserById(id) {
 // APPOINTMENTS
 // ─────────────────────────────────────────────────────────────
 
-export async function getAppointments() {
-const response = await fetch(
-  "http://localhost:5000/api/admin/appointments"
-);
+export async function getAppointments(search = "", status = "") {
+  const params = new URLSearchParams();
+
+  if (search) {
+    params.append("search", search);
+  }
+
+  if (status) {
+    params.append("status", status);
+  }
+
+  const response = await fetch(
+    `http://localhost:5000/api/admin/appointments?${params.toString()}`
+  );
+
   const data = await response.json();
+  
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
   return data;
 }
-
 export async function
 getPatientAppointments(
  patientId
@@ -143,6 +169,12 @@ export async function getDoctorAppointments(doctorId) {
     `http://localhost:5000/api/appointments/doctor/${doctorId}`
   );
 
+  if (!response.ok) {
+    const text = await response.text();
+    console.log(text);
+    throw new Error("Failed to fetch appointments");
+  }
+  
   return await response.json();
 }
 
@@ -314,9 +346,16 @@ export async function addPrescription(
 // DOCTORS
 // ─────────────────────────────────────────────────────────────
 
-export async function getDoctors() {
+export async function getDoctors(search = '', specialization = '') {
+  const params = new URLSearchParams()
+  if (search) {
+    params.append('search', search)
+  }
+    if (specialization) {
+    params.append('specialization', specialization)
+  }
   const response = await fetch(
-    "http://localhost:5000/api/doctors"
+    `http://localhost:5000/api/doctors?${params.toString()}`
   );
 
   const data = await response.json();
@@ -330,14 +369,57 @@ export async function getDoctors() {
   return data;
 }
 
+export async function getAllDoctors(search = "", specialization = "") {
+  const params = new URLSearchParams();
+
+  if (search) {
+    params.append("search", search);
+  }
+
+  if (specialization) {
+    params.append("specialization", specialization);
+  }
+
+  const response = await fetch(
+    `http://localhost:5000/api/doctors/admin/doctors?${params.toString()}`
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
+  return data;
+}
+
+export async function getDoctorDashboard(doctorId) {
+  const response = await fetch(
+    `http://localhost:5000/api/doctors/${doctorId}/dashboard`
+  );
+
+  const data = await response.json();
+
+  if (!response.ok) {
+    throw new Error(data.message);
+  }
+
+  return data;
+}
+
 export async function getDoctorSlots(id) {
   const response = await fetch(
     `http://localhost:5000/api/doctors/slots/${id}`
   );
 
+  if (!response.ok) {
+    const text = await response.text();
+    console.log(text);
+    throw new Error("Failed to fetch slots");
+  }
+
   return await response.json();
 }
-
 export async function updateDoctorSlots(
   id,
   slots
