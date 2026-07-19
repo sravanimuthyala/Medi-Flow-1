@@ -16,39 +16,53 @@ export default function AppointmentMonitoring() {
   const [appointments, setAppointments] = useState([])
 
   // Fetch data from backend
-  useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-       const appts = await getAppointments();
-setAppointments(appts);
-        setAppointments(appts)
-      } catch (e) {
-        console.error('Failed to load data:', e)
-      } finally {
-        setLoading(false)
-      }
+ useEffect(() => {
+  async function loadAppointments() {
+    try {
+      setLoading(true);
+
+      const appts = await getAppointments();
+
+      setAppointments(appts);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
-    fetchData()
-  }, [])
+   }
+
+  loadAppointments();
+}, []);
+
+useEffect(() => {
+  const timer = setTimeout(async () => {
+    try {
+      const appts = await getAppointments(
+        search,
+        statusFilter
+      );
+
+      setAppointments(appts);
+    } catch (e) {
+      console.error(e);
+    }
+  }, 500);
+
+  return () => clearTimeout(timer);
+}, [search, statusFilter]);
 
   async function update(id, status) {
     try {
       await updateAppointmentStatus(id, status)
       // Refresh appointments
-      const updated = await getAppointments()
-      setAppointments(updated)
+           fetchAppointments(search, statusFilter);
     } catch (e) {
       console.error('Failed to update:', e)
     }
   }
 
-  const filtered = appointments.filter(a => {
-    const matchSearch = !search || a.doctor_name.toLowerCase().includes(search.toLowerCase())
-    const matchStatus = !statusFilter || a.status === statusFilter
-    return matchSearch && matchStatus
-  })
 
+  
   // Loading state
   if (loading) {
     return (
@@ -95,7 +109,7 @@ setAppointments(appts);
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filtered.map(appt => {
+              {appointments.map(appt => {
                 return (
                   <tr key={appt.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3 font-medium text-gray-900">#{appt.patient_name}</td>
@@ -121,7 +135,7 @@ setAppointments(appts);
                   </tr>
                 )
               })}
-              {filtered.length === 0 && (
+              {appointments.length === 0 && (
                 <tr>
                   <td colSpan={8} className="text-center py-12">
                     <Calendar className="w-10 h-10 text-gray-300 mx-auto mb-2" />
