@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react'
 import { Calendar, Clock, Users, CheckCircle, Activity, Loader } from 'lucide-react'
-import { getDoctorAppointments } from '../../store/store.js'
+import {
+  getDoctorDashboard,
+  getDoctorAppointments,
+} from '../../store/store.js'
 import { useAuth } from '../../context/AuthContext.jsx'
 
 const statusBadge = {
@@ -14,23 +17,37 @@ export default function DoctorDashboard() {
   const { user } = useAuth()
   const [appointments, setAppointments] = useState([])
   const [loading, setLoading] = useState(true)
-
+const [stats, setStats] = useState({
+  todayAppointments: 0,
+  pending: 0,
+  completed: 0,
+  totalPatients: 0,
+});
   // Fetch appointments from backend
-  useEffect(() => {
-    async function fetchData() {
-      if (!user?.id) return
-      try {
-        setLoading(true)
-        const appts = await getDoctorAppointments(user.id)
-        setAppointments(appts)
-      } catch (e) {
-        console.error('Failed to load appointments:', e)
-      } finally {
-        setLoading(false)
-      }
+useEffect(() => {
+  async function fetchData() {
+    if (!user?.id) return;
+
+    try {
+      setLoading(true);
+
+      const [statsData, appointmentsData] = await Promise.all([
+        getDoctorDashboard(user.id),
+        getDoctorAppointments(user.id),
+      ]);
+
+      setStats(statsData);
+      setAppointments(appointmentsData);
+
+    } catch (e) {
+      console.error("Failed to load dashboard:", e);
+    } finally {
+      setLoading(false);
     }
-    fetchData()
-  }, [user?.id])
+   }
+
+  fetchData();
+}, [user?.id]);
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -57,17 +74,17 @@ export default function DoctorDashboard() {
         <h1 className="text-2xl font-bold mb-1">{user?.fullname}</h1>
         <p className="text-teal-100 text-sm flex items-center gap-2">
           <Activity className="w-4 h-4" />
-          {todayAppts.length} appointment{todayAppts.length !== 1 ? 's' : ''} scheduled today
+          {stats.todayAppointments} appointment{stats.todayAppointments !== 1 ? 's' : ''} scheduled today
         </p>
       </div>
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {[
-          { label: "Today's Appointments", value: todayAppts.length,  icon: Calendar,    color: 'bg-blue-50 text-blue-600'  },
-          { label: 'Pending',              value: pending.length,     icon: Clock,       color: 'bg-yellow-50 text-yellow-600' },
-          { label: 'Completed',            value: completed.length,   icon: CheckCircle, color: 'bg-green-50 text-green-600'  },
-          { label: 'Total Patients',       value: uniquePatients,     icon: Users,       color: 'bg-teal-50 text-teal-600'  },
+           { label: "Today's Appointments", value: stats.todayAppointments,  icon: Calendar,    color: 'bg-blue-50 text-blue-600'  },
+          { label: 'Pending',              value: stats.pending,     icon: Clock,       color: 'bg-yellow-50 text-yellow-600' },
+          { label: 'Completed',            value: stats.completed,   icon: CheckCircle, color: 'bg-green-50 text-green-600'  },
+          { label: 'Total Patients',       value: stats.totalPatients,     icon: Users,       color: 'bg-teal-50 text-teal-600'  },
         ].map(({ label, value, icon: Icon, color }) => (
           <div key={label} className="bg-white rounded-xl border border-gray-100 shadow-sm p-5">
             <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-3 ${color}`}>
@@ -84,7 +101,7 @@ export default function DoctorDashboard() {
         <h2 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
           <Calendar className="w-5 h-5 text-teal-600" /> Today's Appointments
         </h2>
-        {todayAppts.length === 0 ? (
+        {stats.todayAppointments.length === 0 ? (
           <div className="text-center py-10">
             <Calendar className="w-12 h-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-400 text-sm">No appointments today</p>
