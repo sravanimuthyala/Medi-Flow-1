@@ -9,36 +9,50 @@ export default function PatientManagement() {
   const [appointments, setAppointments] = useState([])
 
   // Fetch data from backend
+
   useEffect(() => {
-    async function fetchData() {
-      try {
-        setLoading(true)
-        const [users, appts] = await Promise.all([
-          getUsers(),
-          getAppointments(),
-        ])
-        setPatients(users.filter(u => u.role === 'patient'))
-        setAppointments(appts)
-      } catch (e) {
-        console.error('Failed to load data:', e)
-      } finally {
-        setLoading(false)
-      }
+  async function loadData() {
+    try {
+      setLoading(true);
+
+      const [users, appts] = await Promise.all([
+        getUsers(),
+        getAppointments(),
+      ]);
+
+      setPatients(users);
+      setAppointments(appts);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
     }
-    fetchData()
-  }, [])
+   }
+
+  loadData();
+}, []);
+
+useEffect(() => {
+  const timer = setTimeout(async () => {
+    try {
+      const users = await getUsers(search);
+
+      setPatients(users);
+    } catch (e) {
+      console.error(e);
+    }
+  }, 500);
+
+  return () => clearTimeout(timer);
+}, [search]);
 
   // Count appointments per patient
   function apptCount(id) {
     return appointments.filter(a => a.patient_id === id).length
   }
 
-  const filtered = patients.filter(p =>
-    !search ||
-    p.fullname.toLowerCase().includes(search.toLowerCase()) ||
-    p.email.toLowerCase().includes(search.toLowerCase())
-  )
 
+  
   // Loading state
   if (loading) {
     return (
@@ -73,7 +87,7 @@ export default function PatientManagement() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filtered.map(p => (
+              {patients.map(p => (
                 <tr key={p.id} className="hover:bg-gray-50 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
