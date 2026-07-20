@@ -37,13 +37,56 @@ const getUsers = async (req, res) => {
     });
   }
 };
+
+const approveDoctorOnboarding = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Find the doctor
+    const doctorResult = await pool.query(
+      `SELECT user_id
+       FROM doctors
+       WHERE id = $1`,
+      [id],
+    );
+
+    if (doctorResult.rows.length === 0) {
+      return res.status(404).json({
+        message: "Doctor not found",
+      });
+    }
+
+    const userId = doctorResult.rows[0].user_id;
+
+    // Update the corresponding user
+    const result = await pool.query(
+      `UPDATE users
+       SET onboarding_status = 'approved'
+       WHERE id = $1
+       RETURNING *`,
+      [userId],
+    );
+
+
+    res.json({
+      message: "Doctor onboarding approved successfully.",
+    });
+  } catch (error) {
+    console.log(error);
+
+    res.status(500).json({
+      message: "Server Error",
+    });
+  }
+};
+
 const updateDoctorStatus = async (req, res) => {
   try {
     const { id } = req.params;
     const { active } = req.body;
     const result = await pool.query(
       "UPDATE doctors SET active = $1 WHERE id = $2 RETURNING *",
-      [active, id]
+      [active, id],
     );
     res.json(result.rows[0]);
   } catch (error) {
@@ -51,7 +94,6 @@ const updateDoctorStatus = async (req, res) => {
     res.status(500).json({ error: "Internal server error" });
   }
 };
-
 
 const getAppointments = async (req, res) => {
   try {
@@ -100,7 +142,6 @@ const getAppointments = async (req, res) => {
     const result = await pool.query(query, values);
 
     res.json(result.rows);
-
   } catch (error) {
     console.log(error);
 
@@ -110,5 +151,9 @@ const getAppointments = async (req, res) => {
   }
 };
 
-
-module.exports = { getUsers, updateDoctorStatus, getAppointments };
+module.exports = {
+  getUsers,
+  updateDoctorStatus,
+  getAppointments,
+  approveDoctorOnboarding,
+};

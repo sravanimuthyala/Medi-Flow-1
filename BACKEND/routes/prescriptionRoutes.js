@@ -8,12 +8,9 @@ const {
   addPrescription,
 } = require("../controllers/prescriptionController");
 
-router.get("/",getPrescriptions);
+router.get("/", getPrescriptions);
 
-router.get(
-  "/patient/:patientId",
-  getPatientPrescriptions
-);
+router.get("/patient/:patientId", getPatientPrescriptions);
 
 router.post("/", addPrescription);
 

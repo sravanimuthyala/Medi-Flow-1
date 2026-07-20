@@ -28,8 +28,6 @@ const adminRoutes = require("./routes/adminRoutes");
 
 app.use("/api/admin", adminRoutes);
 
-app.use("/api/prescriptions",  prescriptionRoutes);
-
 app.use("/api/auth", authRoutes);
 
 app.use("/api/doctors", doctorRoutes);
@@ -39,5 +37,7 @@ app.use("/api/hospitals", hospitalRoutes);
 app.use("/api/appointments", appointmentRoutes);
 
 app.use("/api/records", recordRoutes);
+
+app.use("/api/prescriptions",  prescriptionRoutes);
 
 app.use("/api/emergency", emergencyRoutes);

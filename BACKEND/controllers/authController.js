@@ -3,34 +3,35 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const register = async (req, res) => {
   try {
-const {
-  fullname,
-  email,
-  password,
-  role,
-  phone,
-  specialization,
-  department,
-  qualification,
-  experience,
-  fee,
-  hospitalId,
-  bio,
-  image
-} = req.body;
+    const {
+      fullname,
+      email,
+      password,
+      role,
+      phone,
+      specialization,
+      department,
+      qualification,
+      experience,
+      fee,
+      hospitalId,
+      bio,
+      image,
+    } = req.body;
     if (!fullname || !email || !password || !role) {
       return res.status(400).json({
         message: "All fields required",
       });
     }
 
-      if(role === "admin"){
+    if (role === "admin") {
       const adminExists = await pool.query(
-        "SELECT * FROM users WHERE role='admin'"
+        "SELECT * FROM users WHERE role='admin'",
       );
       if (adminExists.rows.length > 0) {
         return res.status(400).json({
-          message: "An admin account already exists. Only one admin is allowed.",
+          message:
+            "An admin account already exists. Only one admin is allowed.",
         });
       }
     }
@@ -48,17 +49,33 @@ const {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const result = await pool.query(
-  `INSERT INTO users
-  (fullname,email,password,role,phone)
-  VALUES($1,$2,$3,$4,$5)
-  RETURNING id,fullname,email,role`,
-  [fullname, email, hashedPassword, role, phone]
-);
+    const onboardingStatus = role === "doctor" ? "pending" : "approved";
 
-if (role === "doctor") {
-  await pool.query(
-    `INSERT INTO doctors
+    const result = await pool.query(
+      `
+INSERT INTO users
+(
+ fullname,
+ email,
+ password,
+ role,
+ phone,
+ onboarding_status
+)
+VALUES($1,$2,$3,$4,$5,$6)
+RETURNING
+id,
+fullname,
+email,
+role,
+onboarding_status
+`,
+      [fullname, email, hashedPassword, role, phone, onboardingStatus],
+    );
+
+    if (role === "doctor") {
+      await pool.query(
+        `INSERT INTO doctors
     (
       name,
       email,
@@ -79,24 +96,24 @@ if (role === "doctor") {
     (
       $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14
     )`,
-    [
-      fullname,
-      email,
-      phone,
-      specialization,
-      department,
-      hospitalId,
-      qualification,
-      experience,
-      fee,
-      0,
-      image,
-      bio,
-      result.rows[0].id,
-      true
-    ]
-  );
-}
+        [
+          fullname,
+          email,
+          phone,
+          specialization,
+          department,
+          hospitalId,
+          qualification,
+          experience,
+          fee,
+          0,
+          image,
+          bio,
+          result.rows[0].id,
+          false,
+        ],
+      );
+    }
 
     res.status(201).json({
       message: "User Registered Successfully",
@@ -114,9 +131,10 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const result = await pool.query("SELECT * FROM users WHERE email=$1", [
-      email,
-    ]);
+    const result = await pool.query(
+      "SELECT u.*, d.active FROM users u LEFT JOIN doctors d ON u.id = d.user_id WHERE u.email = $1;",
+      [email],
+    );
 
     if (result.rows.length === 0) {
       return res.status(404).json({
@@ -152,6 +170,8 @@ const login = async (req, res) => {
         fullname: user.fullname,
         email: user.email,
         role: user.role,
+        onboarding_status: user.onboarding_status,
+        active: user.active,
       },
     });
   } catch (error) {
@@ -166,9 +186,18 @@ const login = async (req, res) => {
 const getCurrentUser = async (req, res) => {
   try {
     const result = await pool.query(
-      `SELECT id,fullname,email,role,phone
-       FROM users
-       WHERE id=$1`,
+      `SELECT
+  u.id,
+  u.fullname,
+  u.email,
+  u.role,
+  u.phone,
+  u.onboarding_status,
+  d.active
+FROM users u
+LEFT JOIN doctors d
+  ON u.id = d.user_id
+WHERE u.id = $1;`,
       [req.user.id],
     );
 
