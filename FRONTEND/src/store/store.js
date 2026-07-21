@@ -11,8 +11,10 @@
 // AUTH
 // ─────────────────────────────────────────────────────────────
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export async function login(email, password) {
-  const response = await fetch("http://localhost:5000/api/auth/login", {
+  const response = await fetch(`${API_URL}/api/auth/login`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -33,7 +35,7 @@ export async function login(email, password) {
 }
 
 export async function register(userData) {
-  const response = await fetch("http://localhost:5000/api/auth/register", {
+  const response = await fetch(`${API_URL}/api/auth/register`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -58,7 +60,7 @@ export async function logout() {
 export async function getCurrentUser() {
   const token = localStorage.getItem("token");
 
-  const response = await fetch("http://localhost:5000/api/auth/me", {
+  const response = await fetch(`${API_URL}/api/auth/me`, {
     headers: {
       Authorization: token,
     },
@@ -89,7 +91,7 @@ export async function getUsers(search = "") {
   }
 
   const response = await fetch(
-    `http://localhost:5000/api/admin/users?${params.toString()}`,
+    `${API_URL}/api/admin/users?${params.toString()}`,
   );
 
   const data = await response.json();
@@ -122,7 +124,7 @@ export async function getAppointments(search = "", status = "") {
   }
 
   const response = await fetch(
-    `http://localhost:5000/api/admin/appointments?${params.toString()}`,
+    `${API_URL}/api/admin/appointments?${params.toString()}`,
   );
 
   const data = await response.json();
@@ -135,7 +137,7 @@ export async function getAppointments(search = "", status = "") {
 }
 export async function getPatientAppointments(patientId) {
   const response = await fetch(
-    `http://localhost:5000/api/appointments/patient/${patientId}`,
+    `${API_URL}/api/appointments/patient/${patientId}`,
   );
 
   const data = await response.json();
@@ -145,7 +147,7 @@ export async function getPatientAppointments(patientId) {
 
 export async function getDoctorAppointments(doctorId) {
   const response = await fetch(
-    `http://localhost:5000/api/doctors/doctor/${doctorId}`,
+    `${API_URL}/api/doctors/doctor/${doctorId}`,
   );
 
   if (!response.ok) {
@@ -157,7 +159,7 @@ export async function getDoctorAppointments(doctorId) {
 
 export async function getPatientMedicalRecords(patientId) {
   const response = await fetch(
-    `http://localhost:5000/api/doctors/patients/${patientId}/records`,
+    `${API_URL}/api/doctors/patients/${patientId}/records`,
   );
 
   const data = await response.json();
@@ -170,7 +172,7 @@ export async function getPatientMedicalRecords(patientId) {
 }
 
 export async function addAppointment(appointmentData) {
-  const response = await fetch("http://localhost:5000/api/appointments", {
+  const response = await fetch(`${API_URL}/api/appointments`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -189,7 +191,7 @@ export async function addAppointment(appointmentData) {
 
 export async function updateAppointmentStatus(id, status) {
   const response = await fetch(
-    `http://localhost:5000/api/doctors/appointments/${id}/status`,
+    `${API_URL}/api/doctors/appointments/${id}/status`,
     {
       method: "PUT",
       headers: {
@@ -209,7 +211,7 @@ export async function updateAppointmentStatus(id, status) {
 }
 export async function cancelAppointment(id) {
   const response = await fetch(
-    `http://localhost:5000/api/appointments/cancel/${id}`,
+    `${API_URL}/api/appointments/cancel/${id}`,
     {
       method: "PUT",
     },
@@ -224,7 +226,7 @@ export async function cancelAppointment(id) {
 
 export async function getRecords(patientId) {
   const response = await fetch(
-    `http://localhost:5000/api/records/${patientId}`,
+    `${API_URL}/api/records/${patientId}`,
   );
 
   const data = await response.json();
@@ -237,7 +239,7 @@ export async function getRecords(patientId) {
 }
 
 export async function addRecord(recordData) {
-  const response = await fetch("http://localhost:5000/api/records", {
+  const response = await fetch(`${API_URL}/api/records`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -255,7 +257,7 @@ export async function addRecord(recordData) {
 }
 
 export async function deleteRecord(id) {
-  const response = await fetch(`http://localhost:5000/api/records/${id}`, {
+  const response = await fetch(`${API_URL}/api/records/${id}`, {
     method: "DELETE",
   });
 
@@ -273,21 +275,21 @@ export async function deleteRecord(id) {
 // ─────────────────────────────────────────────────────────────
 
 export async function getPrescriptions() {
-  const response = await fetch("http://localhost:5000/api/prescriptions");
+  const response = await fetch(`${API_URL}/api/prescriptions`);
 
   return await response.json();
 }
 
 export async function getPatientPrescriptions(patientId) {
   const response = await fetch(
-    `http://localhost:5000/api/prescriptions/patient/${patientId}`,
+    `${API_URL}/api/prescriptions/patient/${patientId}`,
   );
 
   return await response.json();
 }
 
 export async function addPrescription(prescriptionData) {
-  const response = await fetch("http://localhost:5000/api/prescriptions", {
+  const response = await fetch(`${API_URL}/api/prescriptions`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -317,7 +319,7 @@ export async function getDoctors(search = "", specialization = "") {
     params.append("specialization", specialization);
   }
   const response = await fetch(
-    `http://localhost:5000/api/doctors?${params.toString()}`,
+    `${API_URL}/api/doctors?${params.toString()}`,
   );
 
   const data = await response.json();
@@ -341,7 +343,7 @@ export async function getAllDoctors(search = "", specialization = "") {
   }
 
   const response = await fetch(
-    `http://localhost:5000/api/doctors/admin/doctors?${params.toString()}`,
+    `${API_URL}/api/doctors/admin/doctors?${params.toString()}`,
   );
 
   const data = await response.json();
@@ -355,7 +357,7 @@ export async function getAllDoctors(search = "", specialization = "") {
 
 export async function getDoctorDashboard(doctorId) {
   const response = await fetch(
-    `http://localhost:5000/api/doctors/${doctorId}/dashboard`,
+    `${API_URL}/api/doctors/${doctorId}/dashboard`,
   );
 
   const data = await response.json();
@@ -368,7 +370,7 @@ export async function getDoctorDashboard(doctorId) {
 }
 
 export async function getDoctorSlots(id) {
-  const response = await fetch(`http://localhost:5000/api/doctors/slots/${id}`);
+  const response = await fetch(`${API_URL}/api/doctors/slots/${id}`);
 
   if (!response.ok) {
     const text = await response.text();
@@ -379,7 +381,7 @@ export async function getDoctorSlots(id) {
 }
 export async function updateDoctorSlots(id, slots) {
   const response = await fetch(
-    `http://localhost:5000/api/doctors/slots/${id}`,
+    `${API_URL}/api/doctors/slots/${id}`,
     {
       method: "PUT",
       headers: {
@@ -393,7 +395,7 @@ export async function updateDoctorSlots(id, slots) {
 }
 
 export async function getDoctorById(id) {
-  const response = await fetch(`http://localhost:5000/api/doctors/${id}`);
+  const response = await fetch(`${API_URL}/api/doctors/${id}`);
   const data = await response.json();
   if (!response.ok) {
     throw new Error(data.message || "Doctor Not Found");
@@ -403,7 +405,7 @@ export async function getDoctorById(id) {
 
 export async function updateDoctorStatus(id, active) {
   const response = await fetch(
-    `http://localhost:5000/api/admin/doctors/${id}/status`,
+    `${API_URL}/api/admin/doctors/${id}/status`,
     {
       method: "PUT",
       headers: {
@@ -420,7 +422,7 @@ export async function approveDoctor(id) {
   const token = localStorage.getItem("token");
 
   const response = await fetch(
-    `http://localhost:5000/api/admin/doctors/${id}/onboarding`,
+    `${API_URL}/api/admin/doctors/${id}/onboarding`,
     {
       method: "PUT",
       headers: {
@@ -443,7 +445,7 @@ export async function approveDoctor(id) {
 // ─────────────────────────────────────────────────────────────
 
 export async function getHospitals() {
-  const response = await fetch("http://localhost:5000/api/hospitals");
+  const response = await fetch(`${API_URL}/api/hospitals`);
 
   const data = await response.json();
 
@@ -459,7 +461,7 @@ export async function getHospitals() {
 // ─────────────────────────────────────────────────────────────
 
 export async function getEmergencyResources() {
-  const response = await fetch("http://localhost:5000/api/emergency");
+  const response = await fetch(`${API_URL}/api/emergency`);
   const data = await response.json();
 
   if (!response.ok) {
