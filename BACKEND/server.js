@@ -2,7 +2,7 @@ const express = require("express");
 const app = express();
 const cors = require("cors");
 app.use(cors({
-  origin: process.env.FRONTEND_URL
+  origin: http://localhost:5173
 }));
 app.use(express.json());
 app.get("/", (req, res) => {
